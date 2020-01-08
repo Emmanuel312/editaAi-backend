@@ -5,6 +5,8 @@ import RequestNotification from '../schemas/RequestNotification';
 
 class NotificationController {
   async index(req, res) {
+    const { page = 1, limit = 3 } = req.query;
+
     const user = await User.findByPk(req.userId);
 
     if (user.youtuber) {
@@ -13,7 +15,7 @@ class NotificationController {
         .json({ error: 'Only editors can see confirm Notifications' });
     }
 
-    // Query to find all user's services that isn't confirmmed
+    // Query to find all user's services that was confirmm
     const servicesConfirmed = await Service.findAll({
       where: { user_id: req.userId, confirmed: true, done: false },
       attributes: ['id'],
@@ -27,7 +29,9 @@ class NotificationController {
 
     const notifications = await RequestNotification.find({
       service_id: { $in: servicesConfirmedArray },
-    });
+    })
+      .limit(Number(limit))
+      .skip((Number(page) - 1) * Number(limit));
 
     let i = 0;
     const notificationsIncludeUsername = notifications.map(notification => ({

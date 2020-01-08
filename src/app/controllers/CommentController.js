@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 import Comment from '../models/Comment';
 import User from '../models/User';
 import File from '../models/File';
+import Service from '../models/Service';
 
 class CommentController {
   async store(req, res) {
@@ -21,15 +22,44 @@ class CommentController {
         {
           model: User,
           as: 'user',
-          attributes: ['id'],
+          attributes: ['id', 'username', 'youtuber'],
           include: [
-            { model: File, as: 'avatar', attributes: ['name', 'path', 'url'] },
+            { model: File, as: 'avatar', attributes: ['id', 'path', 'url'] },
           ],
         },
       ],
     });
 
     return res.json(commentWithAvatar);
+  }
+
+  async index(req, res) {
+    const service = await Service.findOne({
+      where: { id: req.params.service_id },
+      attributes: ['id', 'youtuber_id'],
+      include: [
+        {
+          model: Comment,
+          as: 'comments',
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'youtuber', 'username'],
+              include: [
+                {
+                  model: File,
+                  as: 'avatar',
+                  attributes: ['url', 'path', 'id'],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    const { username } = await User.findByPk(service.youtuber_id);
+    return res.json({ youtuberUsername: username, service });
   }
 }
 

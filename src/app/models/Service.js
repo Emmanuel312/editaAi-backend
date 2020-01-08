@@ -18,7 +18,7 @@ class Service extends Model {
   }
 
   addRequestNotification(youtuber_avatar_url, username) {
-    const content = `@${username} pediu para vocẽ editar o video dele(a)`;
+    const content = `@${username} pediu para você editar o video dele(a)`;
     return RequestNotification.create({
       service_id: this.id,
       user_id: this.user_id,

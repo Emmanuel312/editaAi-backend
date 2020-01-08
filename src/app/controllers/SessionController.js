@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import User from '../models/User';
+import File from '../models/File';
 
 class AuthController {
   async store(req, res) {
@@ -17,20 +18,26 @@ class AuthController {
 
     const { email, password } = req.body;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      include: [{ model: File, as: 'avatar' }],
+    });
 
     if (!user) return res.status(400).json({ error: 'Email does not exists' });
 
     if (!(await user.checkPassword(password)))
       return res.status(400).json({ error: 'Password does not match' });
 
-    const { id, username, youtuber } = user;
+    const { id, username, youtuber, avatar } = user;
 
     return res.json({
-      id,
-      username,
-      email,
-      youtuber,
+      user: {
+        id,
+        username,
+        email,
+        youtuber,
+        avatar,
+      },
       token: user.generateToken(),
     });
   }

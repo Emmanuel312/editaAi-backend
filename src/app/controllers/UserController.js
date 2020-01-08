@@ -29,10 +29,12 @@ class UserController {
     const { id, youtuber } = await User.create(req.body);
 
     return res.json({
-      id,
-      youtuber,
-      username,
-      email,
+      user: {
+        id,
+        youtuber,
+        username,
+        email,
+      },
     });
   }
 

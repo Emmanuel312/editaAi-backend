@@ -46,6 +46,10 @@ class Routes {
       Controllers.NotificationConfirmController.index
     );
     this.router.post('/comments', Controllers.CommentController.store);
+    this.router.get(
+      '/service/:service_id/comments',
+      Controllers.CommentController.index
+    );
   }
 }
 
